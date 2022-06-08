@@ -8,8 +8,125 @@
     </style>
   </head>
   <body>
-    <canvas id="my-canvas" width="450" height="600"></canvas>
+    <canvas id="my-canvas" width="300" height="500"></canvas>
     <script>
+      // seedrandom
+      // const rng = new Math.seedrandom('abc')
+      // console.log(rng())
+      !(function (f, a, c) {
+        var s,
+          l = 256,
+          p = 'random',
+          d = c.pow(l, 6),
+          g = c.pow(2, 52),
+          y = 2 * g,
+          h = l - 1
+        function n(n, t, r) {
+          function e() {
+            for (var n = u.g(6), t = d, r = 0; n < g; ) (n = (n + r) * l), (t *= l), (r = u.g(1))
+            for (; y <= n; ) (n /= 2), (t /= 2), (r >>>= 1)
+            return (n + r) / t
+          }
+          var o = [],
+            i = j(
+              (function n(t, r) {
+                var e,
+                  o = [],
+                  i = typeof t
+                if (r && 'object' == i)
+                  for (e in t)
+                    try {
+                      o.push(n(t[e], r - 1))
+                    } catch (n) {}
+                return o.length ? o : 'string' == i ? t : t + '\0'
+              })(
+                (t = 1 == t ? { entropy: !0 } : t || {}).entropy
+                  ? [n, S(a)]
+                  : null == n
+                  ? (function () {
+                      try {
+                        var n
+                        return s && (n = s.randomBytes) ? (n = n(l)) : ((n = new Uint8Array(l)), (f.crypto || f.msCrypto).getRandomValues(n)), S(n)
+                      } catch (n) {
+                        var t = f.navigator,
+                          r = t && t.plugins
+                        return [+new Date(), f, r, f.screen, S(a)]
+                      }
+                    })()
+                  : n,
+                3
+              ),
+              o
+            ),
+            u = new m(o)
+          return (
+            (e.int32 = function () {
+              return 0 | u.g(4)
+            }),
+            (e.quick = function () {
+              return u.g(4) / 4294967296
+            }),
+            (e.double = e),
+            j(S(u.S), a),
+            (
+              t.pass ||
+              r ||
+              function (n, t, r, e) {
+                return (
+                  e &&
+                    (e.S && v(e, u),
+                    (n.state = function () {
+                      return v(u, {})
+                    })),
+                  r ? ((c[p] = n), t) : n
+                )
+              }
+            )(e, i, 'global' in t ? t.global : this == c, t.state)
+          )
+        }
+        function m(n) {
+          var t,
+            r = n.length,
+            u = this,
+            e = 0,
+            o = (u.i = u.j = 0),
+            i = (u.S = [])
+          for (r || (n = [r++]); e < l; ) i[e] = e++
+          for (e = 0; e < l; e++) (i[e] = i[(o = h & (o + n[e % r] + (t = i[e])))]), (i[o] = t)
+          ;(u.g = function (n) {
+            for (var t, r = 0, e = u.i, o = u.j, i = u.S; n--; ) (t = i[(e = h & (e + 1))]), (r = r * l + i[h & ((i[e] = i[(o = h & (o + t))]) + (i[o] = t))])
+            return (u.i = e), (u.j = o), r
+          })(l)
+        }
+        function v(n, t) {
+          return (t.i = n.i), (t.j = n.j), (t.S = n.S.slice()), t
+        }
+        function j(n, t) {
+          for (var r, e = n + '', o = 0; o < e.length; ) t[h & o] = h & ((r ^= 19 * t[h & o]) + e.charCodeAt(o++))
+          return S(t)
+        }
+        function S(n) {
+          return String.fromCharCode.apply(0, n)
+        }
+        if ((j(c.random(), a), 'object' == typeof module && module.exports)) {
+          module.exports = n
+          try {
+            s = require('crypto')
+          } catch (n) {}
+        } else
+          'function' == typeof define && define.amd
+            ? define(function () {
+                return n
+              })
+            : (c['seed' + p] = n)
+      })('undefined' != typeof self ? self : this, [], Math)
+
+      // nanoid
+      window.nanoid = (t = 21) =>
+        crypto
+          .getRandomValues(new Uint8Array(t))
+          .reduce((t, e) => (t += (e &= 63) < 36 ? e.toString(36) : e < 62 ? (e - 26).toString(36).toUpperCase() : e > 62 ? '-' : '_'), '')
+
       /*
        * A speed-improved perlin and simplex noise algorithms for 2D.
        *
@@ -25,7 +142,6 @@
        * attribution is appreciated.
        *
        */
-
       ;(function (global) {
         var module = (global.noise = {})
 
@@ -97,8 +213,6 @@
             gradP[i] = gradP[i + 256] = grad3[v % 12]
           }
         }
-
-        module.seed(0)
 
         /*
   for(var i=0; i<256; i++) {
@@ -372,7 +486,13 @@
     </script>
 
     <script>
-      noise.seed(Math.random())
+      let id = Math.floor(Math.random() * 1000000)
+      id = '9871_v9#'
+      const rng = new Math.seedrandom(id)
+      const NOISE_SEED = rng()
+      const START_FACTOR_SEED = rng()
+
+      noise.seed(NOISE_SEED)
 
       const canvas = document.querySelector('#my-canvas')
       const context = canvas.getContext('2d')
@@ -391,7 +511,7 @@
       const t1 = new Date()
       let offsets = []
       for (let i = 0; i < 32; i++) {
-        offsets.push(Math.random() * 2048)
+        offsets.push(rng() * 2048)
       }
 
       function noisr(x, y) {
@@ -423,14 +543,14 @@
         return coast
       }
 
-      const startFactor = 128 + Math.random() * 96 // the smaller the more fractured
+      const startFactor = 24 + START_FACTOR_SEED * 96 // the smaller the more fractured
       const riversStartFactor = 128 + Math.random() * 128
       const BORDER_WIDTH = 1
       const CONTINENT_COLOR = '#fff',
-        BORDER_COLOR = '#000',
-        FRAME_COLOR = '#000',
-        SEA_COLOR = '#fff',
-        SHADOW_COLOR = '#000'
+        BORDER_COLOR = '#333',
+        FRAME_COLOR = '#333',
+        SEA_COLOR = '#ddd',
+        SHADOW_COLOR = '#333'
 
       for (let x = 0; x < canvas.width; x++) {
         for (let y = 0; y < canvas.height; y++) {
@@ -473,11 +593,9 @@
           // shadow
           if (continents == 0.9) {
             if (calcCoast(x, y - 1, startFactor) == 1) continents = 0.8
-            if (calcCoast(x, y - 2, startFactor) == 1) continents = 0.8
-            if (calcCoast(x, y - 3, startFactor) == 1) continents = 0.8
           }
 
-          let color = CONTINENT_COLOR
+          let color = SEA_COLOR
           const neighbors = [
             calcCoast(x, y + 1, startFactor),
             calcCoast(x + 1, y, startFactor),
@@ -487,9 +605,14 @@
 
           if (continents == 1 && neighbors.findIndex((n) => n < 1) >= 0) {
             color = BORDER_COLOR
-          } else if (continents == 0.95) color = SEA_COLOR
-          else if (continents == 0.8) color = SHADOW_COLOR
-          drawPixel(x, y, color)
+            drawPixel(x, y, color)
+          } else if (continents == 1) {
+            color = CONTINENT_COLOR
+            drawPixel(x, y, color)
+          } else if (continents == 0.8) {
+            color = SHADOW_COLOR
+            drawPixel(x, y, color)
+          }
         }
       }
 
@@ -500,21 +623,37 @@
 
       context.beginPath()
       context.fillStyle = FRAME_COLOR
-      context.fillRect(24, canvas.height - 38, 64, 2)
+      context.fillRect(12, canvas.height - 18, 32, 1)
+      context.fillRect(48, canvas.height - 18, 24, 1)
       context.fill()
-      context.fillRect(24, canvas.height - 28, 48, 2)
+      context.fillRect(12, canvas.height - 12, 8, 1)
+      context.fillRect(24, canvas.height - 12, 24, 1)
       context.fill()
+
+      context.fillStyle = '#000'
+      context.font = '8px Arial'
+      context.fillText(`${id}`, 12, 6 + 12)
     </script>
     <style>
       body {
-        background-color: #fff;
-        width: 100%;
-        height: 100%;
+        background: #fff;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media print {
+        body {
+          background: #fff;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
       }
 
       #my-canvas {
         border: none;
-        margin: 0 auto;
       }
     </style>
   </body>
